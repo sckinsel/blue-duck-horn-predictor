@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Duck Farm - Horn Predictor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --navy: #172d48;
+            --navy-light: #1e3a5f;
+            --navy-lighter: #2a5080;
+            --blue-accent: #4a90c4;
+            --slate-900: #1a202c;
+            --slate-700: #334155;
+            --slate-500: #64748b;
+            --slate-400: #94a3b8;
+            --slate-300: #cbd5e1;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --slate-50: #f8fafc;
+            --white: #ffffff;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--slate-100);
+            color: var(--slate-900);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header */
+        header {
+            background: var(--white);
+            padding: 32px 24px 24px;
+            text-align: center;
+            border-bottom: 1px solid var(--slate-200);
+            box-shadow: var(--shadow-sm);
+        }
+
+        header .logo {
+            width: 280px;
+            height: auto;
+            margin-bottom: 12px;
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--slate-500);
+            margin-bottom: 2px;
+        }
+
+        header p {
+            font-size: 0.85rem;
+            color: var(--slate-400);
+            font-weight: 400;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 840px;
+            margin: 0 auto;
+            padding: 32px 20px 48px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 32px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--slate-200);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--slate-400);
+            margin-bottom: 20px;
+        }
+
+        /* Form */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            font-size: 0.82rem;
+            margin-bottom: 6px;
+            color: var(--slate-500);
+            letter-spacing: 0.01em;
+        }
+
+        .form-group input, .form-group select {
+            padding: 11px 14px;
+            border: 1.5px solid var(--slate-300);
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-family: inherit;
+            background: var(--white);
+            color: var(--slate-900);
+            transition: all 0.15s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--blue-accent);
+            box-shadow: 0 0 0 3px rgba(74,144,196,0.15);
+        }
+
+        .form-group input::placeholder {
+            color: var(--slate-400);
+        }
+
+        /* Toggle */
+        .sex-toggle {
+            display: flex;
+            gap: 0;
+            margin-top: 4px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: 1.5px solid var(--slate-300);
+        }
+
+        .sex-toggle label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 11px 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.15s ease;
+            background: var(--white);
+            color: var(--slate-500);
+            flex: 1;
+            border: none;
+            margin: 0;
+        }
+
+        .sex-toggle label:first-of-type {
+            border-right: 1.5px solid var(--slate-300);
+        }
+
+        .sex-toggle input[type="radio"] { display: none; }
+
+        .sex-toggle input[type="radio"]:checked + label {
+            background: var(--navy);
+            color: var(--white);
+        }
+
+        /* Button */
+        .btn-predict {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: var(--navy);
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            margin-top: 24px;
+            transition: all 0.15s ease;
+            letter-spacing: 0.02em;
+        }
+
+        .btn-predict:hover {
+            background: var(--navy-light);
+            box-shadow: 0 4px 12px rgba(23,45,72,0.25);
+            transform: translateY(-1px);
+        }
+
+        .btn-predict:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        /* Results */
+        .results { display: none; }
+        .results.visible { display: block; }
+
+        /* Hero */
+        .result-hero {
+            background: var(--navy);
+            border-radius: var(--radius);
+            padding: 36px 32px;
+            color: var(--white);
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 30px rgba(23,45,72,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%, rgba(0,0,0,0.1) 100%);
+            pointer-events: none;
+        }
+
+        .result-hero .label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        .result-hero .big-number {
+            font-size: 3.8rem;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+
+        .result-hero .big-number .unit {
+            font-size: 1.1rem;
+            font-weight: 500;
+            opacity: 0.6;
+            letter-spacing: 0;
+            margin-left: 4px;
+        }
+
+        .result-hero .sub-info {
+            margin-top: 10px;
+            font-size: 0.88rem;
+            opacity: 0.6;
+            font-weight: 400;
+        }
+
+        .ai-summary {
+            margin-top: 20px;
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.08);
+            border-radius: var(--radius-sm);
+            font-size: 0.88rem;
+            line-height: 1.65;
+            text-align: left;
+            opacity: 0.9;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        /* Stats */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--slate-200);
+        }
+
+        .stat-card .stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--navy);
+            letter-spacing: -0.01em;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--slate-400);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        /* Progress */
+        .progress-bar-container {
+            background: var(--slate-200);
+            border-radius: 100px;
+            height: 28px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--navy) 0%, var(--blue-accent) 100%);
+            border-radius: 100px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 0.75rem;
+            font-weight: 600;
+            min-width: 60px;
+            letter-spacing: 0.02em;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        table th {
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--slate-400);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            border-bottom: 1px solid var(--slate-200);
+        }
+
+        table td {
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            color: var(--slate-700);
+            border-bottom: 1px solid var(--slate-100);
+            font-variant-numeric: tabular-nums;
+        }
+
+        table tbody tr {
+            transition: background 0.1s ease;
+        }
+
+        table tbody tr:hover {
+            background: var(--slate-50);
+        }
+
+        table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        table tr.current-row {
+            background: rgba(74,144,196,0.06);
+        }
+
+        table tr.current-row td {
+            color: var(--navy);
+            font-weight: 600;
+            border-bottom: 2px solid var(--navy);
+        }
+
+        /* Note */
+        .note {
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            padding: 16px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 0.82rem;
+            color: var(--slate-500);
+            line-height: 1.6;
+            margin-top: 20px;
+        }
+
+        .note strong {
+            color: var(--slate-700);
+            font-weight: 600;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 24px 20px;
+            font-size: 0.78rem;
+            color: var(--slate-400);
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: 1fr; }
+            .card { padding: 24px 20px; }
+            .result-hero { padding: 28px 20px; }
+            .result-hero .big-number { font-size: 2.8rem; }
+            header .logo { width: 220px; }
+            table th, table td { padding: 10px 12px; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="blue-duck-farm-logo.png" alt="Blue Duck Farm" class="logo">
+    <h1>Horn Predictor</h1>
+    <p>Texas Longhorn Horn Growth Prediction Tool</p>
+</header>
+
+<div class="container">
+
+    <div class="card">
+        <div class="card-title">Animal Information</div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="dob">Date of Birth</label>
+                <input type="date" id="dob">
+            </div>
+            <div class="form-group">
+                <label for="measureDate">Date of Measurement</label>
+                <input type="date" id="measureDate">
+            </div>
+            <div class="form-group">
+                <label for="hornLength">Tip-to-Tip Measurement (inches)</label>
+                <input type="number" id="hornLength" step="0.01" min="0" placeholder="e.g. 42.5">
+            </div>
+            <div class="form-group">
+                <label>Sex</label>
+                <div class="sex-toggle">
+                    <input type="radio" name="sex" id="cow" value="cow" checked>
+                    <label for="cow">Cow</label>
+                    <input type="radio" name="sex" id="bull" value="bull">
+                    <label for="bull">Bull</label>
+                </div>
+            </div>
+        </div>
+        <button class="btn-predict" onclick="predict()">Predict Horn Growth</button>
+    </div>
+
+    <div class="results" id="results">
+
+        <div class="result-hero" id="heroResult">
+            <div class="label">Predicted Mature Tip-to-Tip Horn Length</div>
+            <div class="big-number" id="matureHorn">--</div>
+            <div class="sub-info" id="heroSub"></div>
+            <div class="ai-summary" id="aiSummary"></div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-value" id="ageAtMeasure">--</div>
+                <div class="stat-label">Age at Measurement</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="pctMature">--</div>
+                <div class="stat-label">% of Mature Horn</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="multiplier">--</div>
+                <div class="stat-label">Multiplier Factor</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Growth Progress</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Growth Milestone Projection</div>
+            <table id="milestoneTable">
+                <thead>
+                    <tr>
+                        <th>Age</th>
+                        <th>% of Mature</th>
+                        <th>Predicted Horn</th>
+                        <th>Growth from Current</th>
+                    </tr>
+                </thead>
+                <tbody id="milestoneBody"></tbody>
+            </table>
+        </div>
+
+        <div class="note">
+            <strong>Note:</strong> These predictions are statistical averages based on TLJ "Super" horned bulls and cows data.
+            Any given animal may do better or worse than the trendline average. Bulls reach ~98% of mature horn by age 5,
+            while cows reach ~93% by age 5. Data source: Malcolm A. Goodman / DALGOOD Longhorns analysis of
+            Texas Longhorn Journal data (119 bull data points, 160 cow data points).
+        </div>
+    </div>
+
+    <div class="footer">Blue Duck Farm &middot; Horn Prediction Tool</div>
+</div>
+
+<script>
+    const MULTIPLIER_TABLE = [
+        [6, 3.15, 3.66],  [7, 2.85, 3.31],  [8, 2.61, 3.02],  [9, 2.42, 2.79],
+        [10, 2.26, 2.60], [11, 2.12, 2.44], [12, 2.00, 2.30], [13, 1.90, 2.19],
+        [14, 1.81, 2.08], [15, 1.74, 1.99], [16, 1.67, 1.91], [17, 1.61, 1.84],
+        [18, 1.56, 1.78], [19, 1.51, 1.72], [20, 1.46, 1.67], [21, 1.42, 1.62],
+        [22, 1.39, 1.58], [23, 1.36, 1.54], [24, 1.33, 1.51], [25, 1.30, 1.47],
+        [26, 1.28, 1.44], [27, 1.25, 1.42], [28, 1.23, 1.39], [29, 1.21, 1.37],
+        [30, 1.20, 1.35], [31, 1.18, 1.33], [32, 1.17, 1.31], [33, 1.15, 1.29],
+        [34, 1.14, 1.27], [35, 1.13, 1.26], [36, 1.12, 1.24], [37, 1.11, 1.23],
+        [38, 1.10, 1.22], [39, 1.09, 1.21], [40, 1.08, 1.20], [41, 1.08, 1.19],
+        [42, 1.07, 1.18], [43, 1.06, 1.17], [44, 1.06, 1.16], [45, 1.05, 1.15],
+        [46, 1.05, 1.14], [47, 1.05, 1.14], [48, 1.04, 1.13], [49, 1.04, 1.12],
+        [50, 1.04, 1.12], [51, 1.03, 1.11], [52, 1.03, 1.11], [53, 1.03, 1.10],
+        [54, 1.03, 1.10], [55, 1.03, 1.09], [56, 1.03, 1.09], [57, 1.03, 1.08],
+        [58, 1.03, 1.08], [59, 1.02, 1.08], [60, 1.02, 1.07]
+    ];
+
+    function getMultiplier(ageMonths, sex) {
+        const col = sex === 'bull' ? 1 : 2;
+        if (ageMonths < 6) {
+            const m6 = MULTIPLIER_TABLE[0][col];
+            const m7 = MULTIPLIER_TABLE[1][col];
+            const slope = (m7 - m6) / 1;
+            const mult = m6 + slope * (ageMonths - 6);
+            return Math.max(mult, m6);
+        }
+        if (ageMonths > 60) {
+            const m60 = sex === 'bull' ? 1.02 : 1.07;
+            const decayRate = sex === 'bull' ? 0.03 : 0.008;
+            const excess = m60 - 1.0;
+            return Math.max(1.0, 1.0 + excess * Math.exp(-decayRate * (ageMonths - 60)));
+        }
+        for (let i = 0; i < MULTIPLIER_TABLE.length - 1; i++) {
+            const m1 = MULTIPLIER_TABLE[i][0], m2 = MULTIPLIER_TABLE[i + 1][0];
+            if (ageMonths >= m1 && ageMonths <= m2) {
+                const frac = (ageMonths - m1) / (m2 - m1);
+                return MULTIPLIER_TABLE[i][col] + frac * (MULTIPLIER_TABLE[i + 1][col] - MULTIPLIER_TABLE[i][col]);
+            }
+        }
+        return MULTIPLIER_TABLE[MULTIPLIER_TABLE.length - 1][col];
+    }
+
+    function getPercentMature(ageMonths, sex) { return 100 / getMultiplier(ageMonths, sex); }
+
+    function calcAgeMonths(dob, measureDate) {
+        return (new Date(measureDate) - new Date(dob)) / (1000 * 60 * 60 * 24 * 30.4375);
+    }
+
+    function formatAge(months) {
+        const years = Math.floor(months / 12), mo = Math.round(months % 12);
+        if (years === 0) return `${mo} mo`;
+        if (mo === 0) return `${years} yr`;
+        return `${years} yr ${mo} mo`;
+    }
+
+    function generateSummary(sex, ageMonths, currentHorn, matureHorn, pctMature) {
+        const animal = sex === 'bull' ? 'bull' : 'cow';
+        const remaining = matureHorn - currentHorn;
+        const feetInches = (inches) => {
+            const ft = Math.floor(inches / 12), inc = (inches % 12).toFixed(1);
+            return ft > 0 ? `${ft}' ${inc}"` : `${inches.toFixed(1)}"`;
+        };
+        let lines = [];
+
+        if (sex === 'bull') {
+            if (currentHorn >= 60) lines.push(`Now THAT'S a set of horns! At ${currentHorn}" this ${animal} is already turning heads.`);
+            else if (currentHorn >= 50) lines.push(`Looking strong! This ${animal} is packing some serious horn at ${currentHorn}".`);
+            else if (currentHorn >= 35) lines.push(`This ${animal} is coming along nicely with ${currentHorn}" of horn on the books.`);
+            else lines.push(`Still growing into those horns! At ${currentHorn}", this young ${animal} has plenty of runway ahead.`);
+        } else {
+            if (currentHorn >= 65) lines.push(`Wow! At ${currentHorn}" this ${animal} is an absolute queen of the pasture!`);
+            else if (currentHorn >= 50) lines.push(`Looking gorgeous! This ${animal} is sporting an impressive ${currentHorn}" spread.`);
+            else if (currentHorn >= 35) lines.push(`This ${animal} is shaping up beautifully with ${currentHorn}" of horn so far.`);
+            else lines.push(`This young lady is just getting started! At ${currentHorn}", she's got a lot of growing to do.`);
+        }
+
+        if (pctMature >= 95) lines.push(`At ${pctMature.toFixed(0)}% of mature growth, what you see is pretty much what you get. Maybe another ${remaining.toFixed(1)}" to go, but the big growth days are behind ${sex === 'bull' ? 'him' : 'her'}.`);
+        else if (pctMature >= 85) lines.push(`With ${pctMature.toFixed(0)}% of mature growth reached, the rapid growth phase is winding down. Expect roughly ${remaining.toFixed(1)}" more over the coming years.`);
+        else if (pctMature >= 65) lines.push(`At ${pctMature.toFixed(0)}% of projected maturity, there's still solid growth ahead \u2014 about ${remaining.toFixed(1)}" more to come!`);
+        else if (pctMature >= 45) lines.push(`Only ${pctMature.toFixed(0)}% grown \u2014 the best is yet to come! With roughly ${remaining.toFixed(1)}" of growth still ahead, things are about to get exciting.`);
+        else lines.push(`At just ${pctMature.toFixed(0)}% of projected maturity, this one is barely getting warmed up. A whopping ${remaining.toFixed(1)}" of growth still to come!`);
+
+        if (sex === 'bull') {
+            if (matureHorn >= 70) lines.push(`Predicted mature horn of ${feetInches(matureHorn)} (${matureHorn.toFixed(1)}") would put this bull in truly elite territory!`);
+            else if (matureHorn >= 60) lines.push(`A projected ${feetInches(matureHorn)} (${matureHorn.toFixed(1)}") at maturity is a very respectable set of horns for any bull.`);
+            else if (matureHorn >= 50) lines.push(`Projected at ${matureHorn.toFixed(1)}" at maturity \u2014 a solid, good-looking bull.`);
+            else lines.push(`Projected at ${matureHorn.toFixed(1)}" at maturity. Every longhorn is special in their own way!`);
+        } else {
+            if (matureHorn >= 75) lines.push(`At a projected ${feetInches(matureHorn)} (${matureHorn.toFixed(1)}") at maturity, this cow could be a record-breaker!`);
+            else if (matureHorn >= 65) lines.push(`A projected ${feetInches(matureHorn)} (${matureHorn.toFixed(1)}") at maturity puts this cow in some very impressive company.`);
+            else if (matureHorn >= 50) lines.push(`Projected at ${matureHorn.toFixed(1)}" at maturity \u2014 a beautiful cow with great horn.`);
+            else lines.push(`Projected at ${matureHorn.toFixed(1)}" at maturity. She'll be a looker no matter what!`);
+        }
+        return lines.join(' ');
+    }
+
+    function predict() {
+        const dobInput = document.getElementById('dob').value;
+        const measureDateInput = document.getElementById('measureDate').value;
+        const hornLength = parseFloat(document.getElementById('hornLength').value);
+        const sex = document.querySelector('input[name="sex"]:checked').value;
+
+        if (!dobInput || !measureDateInput || isNaN(hornLength) || hornLength <= 0) {
+            alert('Please fill in all fields with valid values.');
+            return;
+        }
+
+        const dob = new Date(dobInput + 'T00:00:00');
+        const measureDate = new Date(measureDateInput + 'T00:00:00');
+
+        if (measureDate <= dob) { alert('Measurement date must be after date of birth.'); return; }
+
+        const ageMonths = calcAgeMonths(dob, measureDate);
+        if (ageMonths < 4) { alert('Animal should be at least 4 months old for a meaningful prediction.'); return; }
+
+        const multiplier = getMultiplier(ageMonths, sex);
+        const pctMature = 100 / multiplier;
+        const predictedMature = hornLength * multiplier;
+
+        document.getElementById('results').classList.add('visible');
+        document.getElementById('matureHorn').innerHTML = `${predictedMature.toFixed(1)}<span class="unit">in</span>`;
+        document.getElementById('heroSub').textContent = `${sex === 'bull' ? 'Bull' : 'Cow'}  \u00b7  Measured ${hornLength}" at ${formatAge(ageMonths)}`;
+        document.getElementById('ageAtMeasure').textContent = formatAge(ageMonths);
+        document.getElementById('pctMature').textContent = pctMature.toFixed(1) + '%';
+        document.getElementById('multiplier').textContent = multiplier.toFixed(3) + 'x';
+
+        const bar = document.getElementById('progressBar');
+        setTimeout(() => {
+            bar.style.width = Math.min(pctMature, 100).toFixed(1) + '%';
+            bar.textContent = pctMature.toFixed(1) + '%';
+        }, 100);
+
+        const milestones = sex === 'bull'
+            ? [{ label: '6 months', months: 6 }, { label: '1 year', months: 12 }, { label: '1.5 years', months: 18 },
+               { label: '2 years', months: 24 }, { label: '3 years', months: 36 }, { label: '4 years', months: 48 },
+               { label: '5 years', months: 60 }, { label: '7 years', months: 84 }, { label: '10 years', months: 120 }]
+            : [{ label: '6 months', months: 6 }, { label: '1 year', months: 12 }, { label: '1.5 years', months: 18 },
+               { label: '2 years', months: 24 }, { label: '3 years', months: 36 }, { label: '4 years', months: 48 },
+               { label: '5 years', months: 60 }, { label: '7 years', months: 84 }, { label: '10 years', months: 120 },
+               { label: '15 years', months: 180 }, { label: '20 years', months: 240 }];
+
+        let milestoneHtml = '';
+        for (const ms of milestones) {
+            const msPct = getPercentMature(ms.months, sex);
+            const msHorn = predictedMature * (msPct / 100);
+            const growth = msHorn - hornLength;
+            const isCurrent = Math.abs(ms.months - ageMonths) < 1;
+            const isPast = ms.months < ageMonths - 1;
+            milestoneHtml += `<tr class="${isCurrent ? 'current-row' : ''}">
+                <td>${ms.label}${isCurrent ? ' (now)' : ''}</td>
+                <td>${msPct.toFixed(1)}%</td>
+                <td>${msHorn.toFixed(1)}"</td>
+                <td>${isPast ? '\u2014' : (growth >= 0 ? '+' : '') + growth.toFixed(1) + '"'}</td></tr>`;
+        }
+        document.getElementById('milestoneBody').innerHTML = milestoneHtml;
+
+        const summary = generateSummary(sex, ageMonths, hornLength, predictedMature, pctMature);
+        document.getElementById('aiSummary').innerHTML = summary;
+
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    document.getElementById('measureDate').value = new Date().toISOString().split('T')[0];
+</script>
+
+</body>
+</html>
