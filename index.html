@@ -566,42 +566,20 @@
 
     function generateSummary(sex, ageMonths, currentHorn, matureHorn, pctMature) {
         const animal = sex === 'bull' ? 'bull' : 'cow';
+        const pronoun = sex === 'bull' ? 'him' : 'her';
         const remaining = matureHorn - currentHorn;
-        const feetInches = (inches) => {
-            const ft = Math.floor(inches / 12), inc = (inches % 12).toFixed(1);
-            return ft > 0 ? `${ft}' ${inc}"` : `${inches.toFixed(1)}"`;
-        };
         let lines = [];
 
-        if (sex === 'bull') {
-            if (currentHorn >= 60) lines.push(`Now THAT'S a set of horns! At ${currentHorn}" this ${animal} is already turning heads.`);
-            else if (currentHorn >= 50) lines.push(`Looking strong! This ${animal} is packing some serious horn at ${currentHorn}".`);
-            else if (currentHorn >= 35) lines.push(`This ${animal} is coming along nicely with ${currentHorn}" of horn on the books.`);
-            else lines.push(`Still growing into those horns! At ${currentHorn}", this young ${animal} has plenty of runway ahead.`);
-        } else {
-            if (currentHorn >= 65) lines.push(`Wow! At ${currentHorn}" this ${animal} is an absolute queen of the pasture!`);
-            else if (currentHorn >= 50) lines.push(`Looking gorgeous! This ${animal} is sporting an impressive ${currentHorn}" spread.`);
-            else if (currentHorn >= 35) lines.push(`This ${animal} is shaping up beautifully with ${currentHorn}" of horn so far.`);
-            else lines.push(`This young lady is just getting started! At ${currentHorn}", she's got a lot of growing to do.`);
-        }
+        lines.push(`This ${animal} currently measures ${currentHorn}" tip-to-tip at ${formatAge(ageMonths)} of age.`);
 
-        if (pctMature >= 95) lines.push(`At ${pctMature.toFixed(0)}% of mature growth, what you see is pretty much what you get. Maybe another ${remaining.toFixed(1)}" to go, but the big growth days are behind ${sex === 'bull' ? 'him' : 'her'}.`);
-        else if (pctMature >= 85) lines.push(`With ${pctMature.toFixed(0)}% of mature growth reached, the rapid growth phase is winding down. Expect roughly ${remaining.toFixed(1)}" more over the coming years.`);
-        else if (pctMature >= 65) lines.push(`At ${pctMature.toFixed(0)}% of projected maturity, there's still solid growth ahead \u2014 about ${remaining.toFixed(1)}" more to come!`);
-        else if (pctMature >= 45) lines.push(`Only ${pctMature.toFixed(0)}% grown \u2014 the best is yet to come! With roughly ${remaining.toFixed(1)}" of growth still ahead, things are about to get exciting.`);
-        else lines.push(`At just ${pctMature.toFixed(0)}% of projected maturity, this one is barely getting warmed up. A whopping ${remaining.toFixed(1)}" of growth still to come!`);
+        if (pctMature >= 95) lines.push(`At ${pctMature.toFixed(0)}% of projected mature growth, most growth is complete with approximately ${remaining.toFixed(1)}" remaining.`);
+        else if (pctMature >= 85) lines.push(`At ${pctMature.toFixed(0)}% of projected mature growth, the rapid growth phase is slowing. Approximately ${remaining.toFixed(1)}" of growth remains.`);
+        else if (pctMature >= 65) lines.push(`At ${pctMature.toFixed(0)}% of projected maturity, there is approximately ${remaining.toFixed(1)}" of growth remaining.`);
+        else if (pctMature >= 45) lines.push(`At ${pctMature.toFixed(0)}% of projected maturity, approximately ${remaining.toFixed(1)}" of growth is still expected.`);
+        else lines.push(`At ${pctMature.toFixed(0)}% of projected maturity, significant growth remains with approximately ${remaining.toFixed(1)}" expected.`);
 
-        if (sex === 'bull') {
-            if (matureHorn >= 70) lines.push(`Predicted mature horn of ${matureHorn.toFixed(1)}" would put this bull in truly elite territory!`);
-            else if (matureHorn >= 60) lines.push(`A projected ${matureHorn.toFixed(1)}" at maturity is a very respectable set of horns for any bull.`);
-            else if (matureHorn >= 50) lines.push(`Projected at ${matureHorn.toFixed(1)}" at maturity \u2014 a solid, good-looking bull.`);
-            else lines.push(`Projected at ${matureHorn.toFixed(1)}" at maturity. Every longhorn is special in their own way!`);
-        } else {
-            if (matureHorn >= 75) lines.push(`At a projected ${matureHorn.toFixed(1)}" at maturity, this cow could be a record-breaker!`);
-            else if (matureHorn >= 65) lines.push(`A projected ${matureHorn.toFixed(1)}" at maturity puts this cow in some very impressive company.`);
-            else if (matureHorn >= 50) lines.push(`Projected at ${matureHorn.toFixed(1)}" at maturity \u2014 a beautiful cow with great horn.`);
-            else lines.push(`Projected at ${matureHorn.toFixed(1)}" at maturity. She'll be a looker no matter what!`);
-        }
+        lines.push(`Projected mature tip-to-tip measurement: ${matureHorn.toFixed(1)}".`);
+
         return lines.join(' ');
     }
 
