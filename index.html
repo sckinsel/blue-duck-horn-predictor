@@ -592,13 +592,13 @@
         else lines.push(`At just ${pctMature.toFixed(0)}% of projected maturity, this one is barely getting warmed up. A whopping ${remaining.toFixed(1)}" of growth still to come!`);
 
         if (sex === 'bull') {
-            if (matureHorn >= 70) lines.push(`Predicted mature horn of ${feetInches(matureHorn)} (${matureHorn.toFixed(1)}") would put this bull in truly elite territory!`);
-            else if (matureHorn >= 60) lines.push(`A projected ${feetInches(matureHorn)} (${matureHorn.toFixed(1)}") at maturity is a very respectable set of horns for any bull.`);
+            if (matureHorn >= 70) lines.push(`Predicted mature horn of ${matureHorn.toFixed(1)}" would put this bull in truly elite territory!`);
+            else if (matureHorn >= 60) lines.push(`A projected ${matureHorn.toFixed(1)}" at maturity is a very respectable set of horns for any bull.`);
             else if (matureHorn >= 50) lines.push(`Projected at ${matureHorn.toFixed(1)}" at maturity \u2014 a solid, good-looking bull.`);
             else lines.push(`Projected at ${matureHorn.toFixed(1)}" at maturity. Every longhorn is special in their own way!`);
         } else {
-            if (matureHorn >= 75) lines.push(`At a projected ${feetInches(matureHorn)} (${matureHorn.toFixed(1)}") at maturity, this cow could be a record-breaker!`);
-            else if (matureHorn >= 65) lines.push(`A projected ${feetInches(matureHorn)} (${matureHorn.toFixed(1)}") at maturity puts this cow in some very impressive company.`);
+            if (matureHorn >= 75) lines.push(`At a projected ${matureHorn.toFixed(1)}" at maturity, this cow could be a record-breaker!`);
+            else if (matureHorn >= 65) lines.push(`A projected ${matureHorn.toFixed(1)}" at maturity puts this cow in some very impressive company.`);
             else if (matureHorn >= 50) lines.push(`Projected at ${matureHorn.toFixed(1)}" at maturity \u2014 a beautiful cow with great horn.`);
             else lines.push(`Projected at ${matureHorn.toFixed(1)}" at maturity. She'll be a looker no matter what!`);
         }
