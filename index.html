@@ -492,7 +492,7 @@
     <div class="results" id="results">
 
         <div class="result-hero" id="heroResult">
-            <div class="label">Predicted Mature Tip-to-Tip Horn Length</div>
+            <div class="label">Predicted Tip-to-Tip at 15 Years</div>
             <div class="big-number" id="matureHorn">--</div>
             <div class="sub-info" id="heroSub"></div>
             <div class="ai-summary" id="aiSummary"></div>
@@ -602,21 +602,20 @@
         return `${years} yr ${mo} mo`;
     }
 
-    function generateSummary(sex, ageMonths, currentHorn, matureHorn, pctMature) {
+    function generateSummary(sex, ageMonths, currentHorn, hornAt15, pctMature) {
         const animal = sex === 'bull' ? 'bull' : 'cow';
-        const pronoun = sex === 'bull' ? 'him' : 'her';
-        const remaining = matureHorn - currentHorn;
+        const remaining = hornAt15 - currentHorn;
         let lines = [];
 
         lines.push(`This ${animal} currently measures ${currentHorn}" tip-to-tip at ${formatAge(ageMonths)} of age.`);
 
-        if (pctMature >= 95) lines.push(`At ${pctMature.toFixed(0)}% of projected mature growth, most growth is complete with approximately ${remaining.toFixed(1)}" remaining.`);
-        else if (pctMature >= 85) lines.push(`At ${pctMature.toFixed(0)}% of projected mature growth, the rapid growth phase is slowing. Approximately ${remaining.toFixed(1)}" of growth remains.`);
-        else if (pctMature >= 65) lines.push(`At ${pctMature.toFixed(0)}% of projected maturity, there is approximately ${remaining.toFixed(1)}" of growth remaining.`);
-        else if (pctMature >= 45) lines.push(`At ${pctMature.toFixed(0)}% of projected maturity, approximately ${remaining.toFixed(1)}" of growth is still expected.`);
-        else lines.push(`At ${pctMature.toFixed(0)}% of projected maturity, significant growth remains with approximately ${remaining.toFixed(1)}" expected.`);
+        if (pctMature >= 95) lines.push(`At ${pctMature.toFixed(0)}% of projected growth, most growth is complete with approximately ${remaining.toFixed(1)}" remaining by 15 years.`);
+        else if (pctMature >= 85) lines.push(`At ${pctMature.toFixed(0)}% of projected growth, the rapid growth phase is slowing. Approximately ${remaining.toFixed(1)}" of growth remains through 15 years.`);
+        else if (pctMature >= 65) lines.push(`At ${pctMature.toFixed(0)}% of projected growth, there is approximately ${remaining.toFixed(1)}" of growth remaining through 15 years.`);
+        else if (pctMature >= 45) lines.push(`At ${pctMature.toFixed(0)}% of projected growth, approximately ${remaining.toFixed(1)}" of growth is expected through 15 years.`);
+        else lines.push(`At ${pctMature.toFixed(0)}% of projected growth, significant growth remains with approximately ${remaining.toFixed(1)}" expected through 15 years.`);
 
-        lines.push(`Projected mature tip-to-tip measurement: ${matureHorn.toFixed(1)}".`);
+        lines.push(`Projected tip-to-tip at 15 years: ${hornAt15.toFixed(1)}".`);
 
         return lines.join(' ');
     }
@@ -643,9 +642,11 @@
         const multiplier = getMultiplier(ageMonths, sex);
         const pctMature = 100 / multiplier;
         const predictedMature = hornLength * multiplier;
+        const pctAt15 = getPercentMature(180, sex);
+        const hornAt15 = predictedMature * (pctAt15 / 100);
 
         document.getElementById('results').classList.add('visible');
-        document.getElementById('matureHorn').innerHTML = `${predictedMature.toFixed(1)}<span class="unit">in</span>`;
+        document.getElementById('matureHorn').innerHTML = `${hornAt15.toFixed(1)}<span class="unit">in</span>`;
         document.getElementById('heroSub').textContent = `${sex === 'bull' ? 'Bull' : 'Cow'}  \u00b7  Measured ${hornLength}" at ${formatAge(ageMonths)}`;
         document.getElementById('ageAtMeasure').textContent = formatAge(ageMonths);
         document.getElementById('pctMature').textContent = pctMature.toFixed(1) + '%';
@@ -681,7 +682,7 @@
         }
         document.getElementById('milestoneBody').innerHTML = milestoneHtml;
 
-        const summary = generateSummary(sex, ageMonths, hornLength, predictedMature, pctMature);
+        const summary = generateSummary(sex, ageMonths, hornLength, hornAt15, pctMature);
         document.getElementById('aiSummary').innerHTML = summary;
 
         document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
