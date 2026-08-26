@@ -1,695 +1,669 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blue Duck Farm - Horn Predictor</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-        :root {
-            --navy: #172d48;
-            --navy-light: #1e3a5f;
-            --navy-lighter: #2a5080;
-            --blue-accent: #4a90c4;
-            --slate-900: #1a202c;
-            --slate-700: #334155;
-            --slate-500: #64748b;
-            --slate-400: #94a3b8;
-            --slate-300: #cbd5e1;
-            --slate-200: #e2e8f0;
-            --slate-100: #f1f5f9;
-            --slate-50: #f8fafc;
-            --white: #ffffff;
-            --radius: 16px;
-            --radius-sm: 10px;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
-            --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            background: var(--slate-100);
-            color: var(--slate-900);
-            min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* Header */
-        header {
-            background: var(--white);
-            padding: 32px 24px 24px;
-            text-align: center;
-            border-bottom: 1px solid var(--slate-200);
-            box-shadow: var(--shadow-sm);
-        }
-
-        header .logo {
-            width: 280px;
-            height: auto;
-            margin-bottom: 12px;
-        }
-
-        header h1 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            color: var(--slate-500);
-            margin-bottom: 2px;
-        }
-
-        header p {
-            font-size: 0.85rem;
-            color: var(--slate-400);
-            font-weight: 400;
-        }
-
-        /* Layout */
-        .container {
-            max-width: 840px;
-            margin: 0 auto;
-            padding: 32px 20px 48px;
-        }
-
-        /* Cards */
-        .card {
-            background: var(--white);
-            border-radius: var(--radius);
-            padding: 32px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--slate-200);
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            color: var(--slate-400);
-            margin-bottom: 20px;
-        }
-
-        /* Form */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .form-group label {
-            font-weight: 500;
-            font-size: 0.82rem;
-            margin-bottom: 6px;
-            color: var(--slate-500);
-            letter-spacing: 0.01em;
-        }
-
-        .form-group input, .form-group select {
-            padding: 11px 14px;
-            border: 1.5px solid var(--slate-300);
-            border-radius: var(--radius-sm);
-            font-size: 0.95rem;
-            font-family: inherit;
-            background: var(--white);
-            color: var(--slate-900);
-            transition: all 0.15s ease;
-        }
-
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: var(--blue-accent);
-            box-shadow: 0 0 0 3px rgba(74,144,196,0.15);
-        }
-
-        .form-group input::placeholder {
-            color: var(--slate-400);
-        }
-
-        /* Toggle */
-        .sex-toggle {
-            display: flex;
-            gap: 0;
-            margin-top: 4px;
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-            border: 1.5px solid var(--slate-300);
-        }
-
-        .sex-toggle label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            padding: 11px 20px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.15s ease;
-            background: var(--white);
-            color: var(--slate-500);
-            flex: 1;
-            border: none;
-            margin: 0;
-        }
-
-        .sex-toggle label:first-of-type {
-            border-right: 1.5px solid var(--slate-300);
-        }
-
-        .sex-toggle input[type="radio"] { display: none; }
-
-        .sex-toggle input[type="radio"]:checked + label {
-            background: var(--navy);
-            color: var(--white);
-        }
-
-        /* Button */
-        .btn-predict {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            background: var(--navy);
-            color: var(--white);
-            border: none;
-            border-radius: var(--radius-sm);
-            font-size: 1rem;
-            font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            margin-top: 24px;
-            transition: all 0.15s ease;
-            letter-spacing: 0.02em;
-        }
-
-        .btn-predict:hover {
-            background: var(--navy-light);
-            box-shadow: 0 4px 12px rgba(23,45,72,0.25);
-            transform: translateY(-1px);
-        }
-
-        .btn-predict:active {
-            transform: translateY(0);
-            box-shadow: none;
-        }
-
-        /* Results */
-        .results { display: none; }
-        .results.visible { display: block; }
-
-        /* Hero */
-        .result-hero {
-            background: var(--navy);
-            border-radius: var(--radius);
-            padding: 36px 32px;
-            color: var(--white);
-            text-align: center;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 30px rgba(23,45,72,0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .result-hero::before {
-            content: '';
-            position: absolute;
-            top: 0; right: 0; bottom: 0; left: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%, rgba(0,0,0,0.1) 100%);
-            pointer-events: none;
-        }
-
-        .result-hero .label {
-            font-size: 0.78rem;
-            font-weight: 600;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            opacity: 0.7;
-            margin-bottom: 8px;
-        }
-
-        .result-hero .big-number {
-            font-size: 3.8rem;
-            font-weight: 700;
-            line-height: 1;
-            letter-spacing: -0.02em;
-        }
-
-        .result-hero .big-number .unit {
-            font-size: 1.1rem;
-            font-weight: 500;
-            opacity: 0.6;
-            letter-spacing: 0;
-            margin-left: 4px;
-        }
-
-        .result-hero .sub-info {
-            margin-top: 10px;
-            font-size: 0.88rem;
-            opacity: 0.6;
-            font-weight: 400;
-        }
-
-        .ai-summary {
-            margin-top: 20px;
-            padding: 16px 20px;
-            background: rgba(255,255,255,0.08);
-            border-radius: var(--radius-sm);
-            font-size: 0.88rem;
-            line-height: 1.65;
-            text-align: left;
-            opacity: 0.9;
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255,255,255,0.06);
-        }
-
-        /* Stats */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: var(--white);
-            border-radius: var(--radius);
-            padding: 20px;
-            text-align: center;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--slate-200);
-        }
-
-        .stat-card .stat-value {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: var(--navy);
-            letter-spacing: -0.01em;
-        }
-
-        .stat-card .stat-label {
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: var(--slate-400);
-            margin-top: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        /* Progress */
-        .progress-bar-container {
-            background: var(--slate-200);
-            border-radius: 100px;
-            height: 28px;
-            overflow: hidden;
-            margin: 8px 0;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--navy) 0%, var(--blue-accent) 100%);
-            border-radius: 100px;
-            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--white);
-            font-size: 0.75rem;
-            font-weight: 600;
-            min-width: 60px;
-            letter-spacing: 0.02em;
-        }
-
-        /* Table */
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        table th {
-            padding: 10px 16px;
-            text-align: left;
-            font-size: 0.72rem;
-            font-weight: 600;
-            color: var(--slate-400);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            border-bottom: 1px solid var(--slate-200);
-        }
-
-        table td {
-            padding: 12px 16px;
-            font-size: 0.9rem;
-            color: var(--slate-700);
-            border-bottom: 1px solid var(--slate-100);
-            font-variant-numeric: tabular-nums;
-        }
-
-        table tbody tr {
-            transition: background 0.1s ease;
-        }
-
-        table tbody tr:hover {
-            background: var(--slate-50);
-        }
-
-        table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        table tr.current-row {
-            background: rgba(74,144,196,0.06);
-        }
-
-        table tr.current-row td {
-            color: var(--navy);
-            font-weight: 600;
-            border-bottom: 2px solid var(--navy);
-        }
-
-        /* Note */
-        .note {
-            background: var(--slate-50);
-            border: 1px solid var(--slate-200);
-            padding: 16px 20px;
-            border-radius: var(--radius-sm);
-            font-size: 0.82rem;
-            color: var(--slate-500);
-            line-height: 1.6;
-            margin-top: 20px;
-        }
-
-        .note strong {
-            color: var(--slate-700);
-            font-weight: 600;
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            padding: 24px 20px;
-            font-size: 0.78rem;
-            color: var(--slate-400);
-        }
-
-        /* Responsive — tablet */
-        @media (max-width: 768px) {
-            .container { padding: 20px 16px 36px; }
-            .card { padding: 24px 20px; }
-            .result-hero { padding: 28px 20px; }
-            header { padding: 24px 16px 20px; }
-            header .logo { width: 240px; }
-        }
-
-        /* Responsive — mobile */
-        @media (max-width: 640px) {
-            .form-grid { grid-template-columns: 1fr; }
-            .stats-row { grid-template-columns: repeat(3, 1fr); gap: 10px; }
-            .stat-card { padding: 14px 8px; }
-            .stat-card .stat-value { font-size: 1.25rem; }
-            .stat-card .stat-label { font-size: 0.65rem; }
-            .card { padding: 20px 16px; }
-            .result-hero { padding: 24px 16px; }
-            .result-hero .big-number { font-size: 2.8rem; }
-            header .logo { width: 200px; }
-            header h1 { font-size: 1.1rem; }
-            table th, table td { padding: 10px 12px; font-size: 0.85rem; }
-            .note { padding: 14px 16px; font-size: 0.78rem; }
-            .ai-summary { padding: 14px 16px; font-size: 0.82rem; }
-        }
-
-        /* Responsive — small phones */
-        @media (max-width: 400px) {
-            .container { padding: 16px 12px 32px; }
-            .card { padding: 18px 14px; }
-            .result-hero { padding: 20px 14px; }
-            .result-hero .big-number { font-size: 2.4rem; }
-            header .logo { width: 180px; }
-            header h1 { font-size: 1rem; }
-            header p { font-size: 0.78rem; }
-            .card-title { font-size: 0.72rem; }
-            .btn-predict { padding: 12px; font-size: 0.92rem; }
-            .stats-row { gap: 8px; }
-            .stat-card { padding: 12px 6px; }
-            .stat-card .stat-value { font-size: 1.1rem; }
-            .stat-card .stat-label { font-size: 0.6rem; }
-            table th, table td { padding: 8px 10px; font-size: 0.8rem; }
-        }
-
-        /* Iframe embed mode */
-        html.embedded body { background: transparent; }
-        html.embedded header { box-shadow: none; border-bottom: none; }
-        html.embedded .footer { display: none; }
-    </style>
-</head>
-<body>
-
-<header>
-    <img src="blue-duck-farm-logo.png" alt="Blue Duck Farm" class="logo">
-    <h1>Horn Predictor</h1>
-    <p>Texas Longhorn Horn Growth Prediction Tool</p>
-</header>
-
-<div class="container">
-
-    <div class="card">
-        <div class="card-title">Animal Information</div>
-        <div class="form-grid">
-            <div class="form-group">
-                <label for="dob">Date of Birth</label>
-                <input type="date" id="dob">
-            </div>
-            <div class="form-group">
-                <label for="measureDate">Date of Measurement</label>
-                <input type="date" id="measureDate">
-            </div>
-            <div class="form-group">
-                <label for="hornLength">Tip-to-Tip Measurement (inches)</label>
-                <input type="number" id="hornLength" step="0.01" min="0" placeholder="e.g. 42.5">
-            </div>
-            <div class="form-group">
-                <label>Sex</label>
-                <div class="sex-toggle">
-                    <input type="radio" name="sex" id="cow" value="cow" checked>
-                    <label for="cow">Cow</label>
-                    <input type="radio" name="sex" id="bull" value="bull">
-                    <label for="bull">Bull</label>
-                </div>
-            </div>
-        </div>
-        <button class="btn-predict" onclick="predict()">Predict Horn Growth</button>
-    </div>
-
-    <div class="results" id="results">
-
-        <div class="result-hero" id="heroResult">
-            <div class="label">Predicted Tip-to-Tip</div>
-            <div class="big-number" id="matureHorn">--</div>
-            <div class="sub-info" id="heroSub"></div>
-            <div class="ai-summary" id="aiSummary"></div>
-        </div>
-
-        <div class="stats-row">
-            <div class="stat-card">
-                <div class="stat-value" id="ageAtMeasure">--</div>
-                <div class="stat-label">Age at Measurement</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="pctMature">--</div>
-                <div class="stat-label">% of Mature Horn</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="multiplier">--</div>
-                <div class="stat-label">Multiplier Factor</div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">Growth Progress</div>
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">Growth Milestone Projection</div>
-            <table id="milestoneTable">
-                <thead>
-                    <tr>
-                        <th>Age</th>
-                        <th>% of Mature</th>
-                        <th>Predicted Horn</th>
-                        <th>Growth from Current</th>
-                    </tr>
-                </thead>
-                <tbody id="milestoneBody"></tbody>
-            </table>
-        </div>
-
-        <div class="note">
-            <strong>Note:</strong> These predictions are statistical averages based on TLJ "Super" horned bulls and cows data.
-            Any given animal may do better or worse than the trendline average. Bulls reach ~98% of mature horn by age 5,
-            while cows reach ~93% by age 5. Data source: Malcolm A. Goodman / DALGOOD Longhorns analysis of
-            Texas Longhorn Journal data (119 bull data points, 160 cow data points).
-        </div>
-    </div>
-
-    <div class="footer">Blue Duck Farm &middot; Horn Prediction Tool</div>
-</div>
-
-<script>
-    const MULTIPLIER_TABLE = [
-        [6, 3.15, 3.66],  [7, 2.85, 3.31],  [8, 2.61, 3.02],  [9, 2.42, 2.79],
-        [10, 2.26, 2.60], [11, 2.12, 2.44], [12, 2.00, 2.30], [13, 1.90, 2.19],
-        [14, 1.81, 2.08], [15, 1.74, 1.99], [16, 1.67, 1.91], [17, 1.61, 1.84],
-        [18, 1.56, 1.78], [19, 1.51, 1.72], [20, 1.46, 1.67], [21, 1.42, 1.62],
-        [22, 1.39, 1.58], [23, 1.36, 1.54], [24, 1.33, 1.51], [25, 1.30, 1.47],
-        [26, 1.28, 1.44], [27, 1.25, 1.42], [28, 1.23, 1.39], [29, 1.21, 1.37],
-        [30, 1.20, 1.35], [31, 1.18, 1.33], [32, 1.17, 1.31], [33, 1.15, 1.29],
-        [34, 1.14, 1.27], [35, 1.13, 1.26], [36, 1.12, 1.24], [37, 1.11, 1.23],
-        [38, 1.10, 1.22], [39, 1.09, 1.21], [40, 1.08, 1.20], [41, 1.08, 1.19],
-        [42, 1.07, 1.18], [43, 1.06, 1.17], [44, 1.06, 1.16], [45, 1.05, 1.15],
-        [46, 1.05, 1.14], [47, 1.05, 1.14], [48, 1.04, 1.13], [49, 1.04, 1.12],
-        [50, 1.04, 1.12], [51, 1.03, 1.11], [52, 1.03, 1.11], [53, 1.03, 1.10],
-        [54, 1.03, 1.10], [55, 1.03, 1.09], [56, 1.03, 1.09], [57, 1.03, 1.08],
-        [58, 1.03, 1.08], [59, 1.02, 1.08], [60, 1.02, 1.07]
-    ];
-
-    function getMultiplier(ageMonths, sex) {
-        const col = sex === 'bull' ? 1 : 2;
-        if (ageMonths < 6) {
-            const m6 = MULTIPLIER_TABLE[0][col];
-            const m7 = MULTIPLIER_TABLE[1][col];
-            const slope = (m7 - m6) / 1;
-            const mult = m6 + slope * (ageMonths - 6);
-            return Math.max(mult, m6);
-        }
-        if (ageMonths > 60) {
-            const m60 = sex === 'bull' ? 1.02 : 1.07;
-            const decayRate = sex === 'bull' ? 0.03 : 0.008;
-            const excess = m60 - 1.0;
-            return Math.max(1.0, 1.0 + excess * Math.exp(-decayRate * (ageMonths - 60)));
-        }
-        for (let i = 0; i < MULTIPLIER_TABLE.length - 1; i++) {
-            const m1 = MULTIPLIER_TABLE[i][0], m2 = MULTIPLIER_TABLE[i + 1][0];
-            if (ageMonths >= m1 && ageMonths <= m2) {
-                const frac = (ageMonths - m1) / (m2 - m1);
-                return MULTIPLIER_TABLE[i][col] + frac * (MULTIPLIER_TABLE[i + 1][col] - MULTIPLIER_TABLE[i][col]);
-            }
-        }
-        return MULTIPLIER_TABLE[MULTIPLIER_TABLE.length - 1][col];
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blue Duck Farm – Horn Prediction Tool</title>
+  <meta name="description" content="Modern Texas Longhorn horn growth predictor for cows and bulls. Updated with contemporary elite data." />
+  <style>
+    :root {
+      --navy: #0f1c2e;
+      --navy-light: #1a2d47;
+      --gold: #c9a227;
+      --gold-soft: #e8d48b;
+      --cream: #f7f3e8;
+      --white: #ffffff;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-500: #64748b;
+      --gray-700: #334155;
+      --success: #059669;
+      --radius: 16px;
+      --shadow: 0 10px 30px -5px rgba(15, 28, 46, 0.12);
+      --shadow-lg: 0 20px 40px -10px rgba(15, 28, 46, 0.18);
     }
 
-    function getPercentMature(ageMonths, sex) { return 100 / getMultiplier(ageMonths, sex); }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-    function calcAgeMonths(dob, measureDate) {
-        return (new Date(measureDate) - new Date(dob)) / (1000 * 60 * 60 * 24 * 30.4375);
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(160deg, #0f1c2e 0%, #1a2d47 45%, #243b55 100%);
+      color: var(--gray-700);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      padding: 32px 0 28px;
+      color: var(--cream);
+    }
+
+    .logo-mark {
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold-soft);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    h1 {
+      font-size: clamp(1.75rem, 5vw, 2.25rem);
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: rgba(247, 243, 232, 0.75);
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px 24px;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title span {
+      display: inline-flex;
+      width: 28px;
+      height: 28px;
+      background: var(--navy);
+      color: var(--gold);
+      border-radius: 8px;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    /* Form */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 560px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    input[type="date"],
+    input[type="number"] {
+      padding: 12px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 10px;
+      font-size: 1rem;
+      color: var(--navy);
+      background: var(--gray-100);
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--gold);
+      background: var(--white);
+    }
+
+    /* Sex Toggle */
+    .sex-toggle {
+      display: flex;
+      background: var(--gray-100);
+      border-radius: 10px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .sex-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      background: transparent;
+      color: var(--gray-500);
+      transition: all 0.2s;
+    }
+
+    .sex-btn.active {
+      background: var(--navy);
+      color: var(--white);
+      box-shadow: 0 2px 8px rgba(15, 28, 46, 0.25);
+    }
+
+    /* Predict Button */
+    .predict-btn {
+      width: 100%;
+      margin-top: 22px;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+      color: var(--white);
+      border: none;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      letter-spacing: 0.02em;
+    }
+
+    .predict-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(15, 28, 46, 0.3);
+    }
+
+    .predict-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Results */
+    #results {
+      display: none;
+      animation: fadeUp 0.4s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-result {
+      text-align: center;
+      padding: 8px 0 20px;
+    }
+
+    .hero-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-500);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .hero-value {
+      font-size: clamp(2.8rem, 10vw, 3.6rem);
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1.1;
+    }
+
+    .hero-value span {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--gray-500);
+    }
+
+    .hero-sub {
+      margin-top: 8px;
+      font-size: 0.95rem;
+      color: var(--gray-500);
+    }
+
+    /* Stats row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    @media (max-width: 480px) {
+      .stats-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stat-card {
+      background: var(--gray-100);
+      border-radius: 12px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-500);
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    /* Progress */
+    .progress-section {
+      margin: 24px 0 8px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--gray-700);
+    }
+
+    .progress-bar {
+      height: 12px;
+      background: var(--gray-200);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #1a2d47, var(--gold));
+      border-radius: 99px;
+      transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* Milestone table */
+    .milestone-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 0.9rem;
+    }
+
+    .milestone-table th {
+      text-align: left;
+      padding: 10px 8px;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-500);
+      border-bottom: 2px solid var(--gray-200);
+      font-weight: 700;
+    }
+
+    .milestone-table td {
+      padding: 11px 8px;
+      border-bottom: 1px solid var(--gray-200);
+      color: var(--navy);
+    }
+
+    .milestone-table tr.current-row {
+      background: rgba(201, 162, 39, 0.08);
+      font-weight: 600;
+    }
+
+    .milestone-table tr.current-row td {
+      color: var(--navy);
+    }
+
+    /* Note */
+    .data-note {
+      margin-top: 20px;
+      padding: 14px 16px;
+      background: var(--gray-100);
+      border-radius: 10px;
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      line-height: 1.55;
+    }
+
+    .data-note strong {
+      color: var(--gray-700);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 28px 16px 10px;
+      color: rgba(247, 243, 232, 0.55);
+      font-size: 0.8rem;
+    }
+
+    footer a {
+      color: var(--gold-soft);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo-mark">Blue Duck Farm</div>
+      <h1>Horn Prediction Tool</h1>
+      <p class="subtitle">Modern Texas Longhorn growth predictor for cows &amp; bulls — updated with contemporary elite data</p>
+    </header>
+
+    <!-- Input Card -->
+    <div class="card">
+      <div class="card-title"><span>1</span> Animal Details</div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="dob">Date of Birth</label>
+          <input type="date" id="dob" required />
+        </div>
+
+        <div class="form-group">
+          <label for="measDate">Date of Measurement</label>
+          <input type="date" id="measDate" required />
+        </div>
+
+        <div class="form-group">
+          <label for="ttt">Tip-to-Tip (inches)</label>
+          <input type="number" id="ttt" min="5" max="150" step="0.125" placeholder="e.g. 42.5" required />
+        </div>
+
+        <div class="form-group">
+          <label>Sex</label>
+          <div class="sex-toggle">
+            <button type="button" class="sex-btn active" data-sex="cow" id="btnCow">Cow</button>
+            <button type="button" class="sex-btn" data-sex="bull" id="btnBull">Bull</button>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="predict-btn" id="predictBtn">Predict Horn Growth</button>
+    </div>
+
+    <!-- Results Card -->
+    <div class="card" id="results">
+      <div class="card-title"><span>2</span> Prediction Results</div>
+
+      <div class="hero-result">
+        <div class="hero-label">Projected Mature Tip-to-Tip</div>
+        <div class="hero-value" id="matureValue">— <span>in</span></div>
+        <div class="hero-sub" id="heroSub">—</div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value" id="ageValue">—</div>
+          <div class="stat-label">Age at Measurement</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="pctValue">—</div>
+          <div class="stat-label">% of Mature Horn</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="multValue">—</div>
+          <div class="stat-label">Multiplier Factor</div>
+        </div>
+      </div>
+
+      <div class="progress-section">
+        <div class="progress-header">
+          <span>Growth Progress</span>
+          <span id="progressPct">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <div style="margin-top: 28px;">
+        <div class="card-title" style="font-size: 0.95rem; margin-bottom: 12px;">Growth Milestone Projection</div>
+        <table class="milestone-table">
+          <thead>
+            <tr>
+              <th>Age</th>
+              <th>% of Mature</th>
+              <th>Predicted Horn</th>
+              <th>Growth Left</th>
+            </tr>
+          </thead>
+          <tbody id="milestoneBody">
+            <!-- filled by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="data-note">
+        <strong>Note:</strong> These projections use updated statistical averages from contemporary elite Texas Longhorns (Arrowhead Gallery of Horns — Club 80 / 90 / 100). Modern genetics keep adding horn later than the 1999 Dalgood / TLJ tables. Individual animals can exceed or fall short of the average. Models will continue to improve as more measurement histories are added.
+      </div>
+    </div>
+
+    <footer>
+      Blue Duck Farm · Horn Prediction Tool · v2 (Arrowhead-updated)<br />
+      <a href="https://www.blueduckfarmtx.com" target="_blank" rel="noopener">blueduckfarmtx.com</a>
+    </footer>
+  </div>
+
+  <script>
+    // =====================================================
+    // GROWTH MODELS  (easily editable)
+    // Percent of mature horn reached at key ages
+    // These will be refined with more Club data
+    // =====================================================
+    const GROWTH_MODELS = {
+      cow: {
+        // Empirical curve from Arrowhead Club 80/90/100 cows
+        // (39 animals, 814 measurements as of Aug 2026)
+        // Modern elite cows keep growing later than 1999 Dalgood data
+        milestones: [
+          { ageMonths: 6,   pct: 0.23 },
+          { ageMonths: 12,  pct: 0.36 },
+          { ageMonths: 18,  pct: 0.49 },
+          { ageMonths: 24,  pct: 0.62 },
+          { ageMonths: 36,  pct: 0.75 },
+          { ageMonths: 48,  pct: 0.86 },
+          { ageMonths: 60,  pct: 0.90 },
+          { ageMonths: 84,  pct: 0.95 },
+          { ageMonths: 120, pct: 0.97 },
+          { ageMonths: 180, pct: 0.985 }
+        ],
+        label: "Cow"
+      },
+      bull: {
+        // Empirical curve from Arrowhead Club 90/100 bulls
+        // (37 animals, 672 measurements as of Aug 2026)
+        milestones: [
+          { ageMonths: 6,   pct: 0.25 },
+          { ageMonths: 12,  pct: 0.41 },
+          { ageMonths: 18,  pct: 0.59 },
+          { ageMonths: 24,  pct: 0.74 },
+          { ageMonths: 36,  pct: 0.89 },
+          { ageMonths: 48,  pct: 0.93 },
+          { ageMonths: 60,  pct: 0.96 },
+          { ageMonths: 84,  pct: 0.97 },
+          { ageMonths: 120, pct: 0.99 },
+          { ageMonths: 180, pct: 0.995 }
+        ],
+        label: "Bull"
+      }
+    };
+
+    // -------------------------------------------------
+    // Helpers
+    // -------------------------------------------------
+    function monthsBetween(dob, meas) {
+      let months = (meas.getFullYear() - dob.getFullYear()) * 12;
+      months -= dob.getMonth();
+      months += meas.getMonth();
+      if (meas.getDate() < dob.getDate()) months--;
+      return Math.max(0, months);
     }
 
     function formatAge(months) {
-        const years = Math.floor(months / 12), mo = Math.round(months % 12);
-        if (years === 0) return `${mo} mo`;
-        if (mo === 0) return `${years} yr`;
-        return `${years} yr ${mo} mo`;
+      const y = Math.floor(months / 12);
+      const m = months % 12;
+      if (y === 0) return `${m} mo`;
+      if (m === 0) return `${y} yr`;
+      return `${y} yr ${m} mo`;
     }
 
-    function generateSummary(sex, ageMonths, currentHorn, hornAt15, pctMature) {
-        const animal = sex === 'bull' ? 'bull' : 'cow';
-        const remaining = hornAt15 - currentHorn;
-        let lines = [];
+    // Linear interpolation between milestones
+    function getPercentAtAge(sex, ageMonths) {
+      const ms = GROWTH_MODELS[sex].milestones;
+      if (ageMonths <= ms[0].ageMonths) return ms[0].pct;
+      if (ageMonths >= ms[ms.length - 1].ageMonths) return ms[ms.length - 1].pct;
 
-        lines.push(`This ${animal} currently measures ${currentHorn}" tip-to-tip at ${formatAge(ageMonths)} of age.`);
-
-        if (pctMature >= 95) lines.push(`At ${pctMature.toFixed(0)}% of projected growth, most growth is complete with approximately ${remaining.toFixed(1)}" remaining by 15 years.`);
-        else if (pctMature >= 85) lines.push(`At ${pctMature.toFixed(0)}% of projected growth, the rapid growth phase is slowing. Approximately ${remaining.toFixed(1)}" of growth remains through 15 years.`);
-        else if (pctMature >= 65) lines.push(`At ${pctMature.toFixed(0)}% of projected growth, there is approximately ${remaining.toFixed(1)}" of growth remaining through 15 years.`);
-        else if (pctMature >= 45) lines.push(`At ${pctMature.toFixed(0)}% of projected growth, approximately ${remaining.toFixed(1)}" of growth is expected through 15 years.`);
-        else lines.push(`At ${pctMature.toFixed(0)}% of projected growth, significant growth remains with approximately ${remaining.toFixed(1)}" expected through 15 years.`);
-
-        lines.push(`Projected tip-to-tip at 15 years: ${hornAt15.toFixed(1)}".`);
-
-        return lines.join(' ');
+      for (let i = 0; i < ms.length - 1; i++) {
+        const a = ms[i];
+        const b = ms[i + 1];
+        if (ageMonths >= a.ageMonths && ageMonths <= b.ageMonths) {
+          const t = (ageMonths - a.ageMonths) / (b.ageMonths - a.ageMonths);
+          return a.pct + t * (b.pct - a.pct);
+        }
+      }
+      return 0.99;
     }
 
-    function predict() {
-        const dobInput = document.getElementById('dob').value;
-        const measureDateInput = document.getElementById('measureDate').value;
-        const hornLength = parseFloat(document.getElementById('hornLength').value);
-        const sex = document.querySelector('input[name="sex"]:checked').value;
+    // -------------------------------------------------
+    // UI State
+    // -------------------------------------------------
+    let currentSex = "cow";
 
-        if (!dobInput || !measureDateInput || isNaN(hornLength) || hornLength <= 0) {
-            alert('Please fill in all fields with valid values.');
-            return;
+    document.getElementById("btnCow").addEventListener("click", () => {
+      currentSex = "cow";
+      document.getElementById("btnCow").classList.add("active");
+      document.getElementById("btnBull").classList.remove("active");
+    });
+
+    document.getElementById("btnBull").addEventListener("click", () => {
+      currentSex = "bull";
+      document.getElementById("btnBull").classList.add("active");
+      document.getElementById("btnCow").classList.remove("active");
+    });
+
+    // Default dates for convenience
+    const today = new Date().toISOString().slice(0, 10);
+    document.getElementById("measDate").value = today;
+
+    // -------------------------------------------------
+    // Predict
+    // -------------------------------------------------
+    document.getElementById("predictBtn").addEventListener("click", function () {
+      try {
+        const dobStr = document.getElementById("dob").value;
+        const measStr = document.getElementById("measDate").value;
+        const tttRaw = document.getElementById("ttt").value;
+        const ttt = parseFloat(tttRaw);
+
+        if (!dobStr || !measStr || tttRaw === "" || isNaN(ttt) || ttt < 5) {
+          alert("Please fill in:\n• Date of Birth\n• Date of Measurement\n• Tip-to-Tip measurement (at least 5 inches)");
+          return;
         }
 
-        const dob = new Date(dobInput + 'T00:00:00');
-        const measureDate = new Date(measureDateInput + 'T00:00:00');
+        const dob = new Date(dobStr + "T12:00:00");
+        const meas = new Date(measStr + "T12:00:00");
 
-        if (measureDate <= dob) { alert('Measurement date must be after date of birth.'); return; }
-
-        const ageMonths = calcAgeMonths(dob, measureDate);
-        if (ageMonths < 4) { alert('Animal should be at least 4 months old for a meaningful prediction.'); return; }
-
-        const multiplier = getMultiplier(ageMonths, sex);
-        const pctMature = 100 / multiplier;
-        const predictedMature = hornLength * multiplier;
-        const pctAt15 = getPercentMature(180, sex);
-        const hornAt15 = predictedMature * (pctAt15 / 100);
-
-        document.getElementById('results').classList.add('visible');
-        document.getElementById('matureHorn').innerHTML = `${hornAt15.toFixed(1)}<span class="unit">in</span>`;
-        document.getElementById('heroSub').textContent = `${sex === 'bull' ? 'Bull' : 'Cow'}  \u00b7  Measured ${hornLength}" at ${formatAge(ageMonths)}`;
-        document.getElementById('ageAtMeasure').textContent = formatAge(ageMonths);
-        document.getElementById('pctMature').textContent = pctMature.toFixed(1) + '%';
-        document.getElementById('multiplier').textContent = multiplier.toFixed(3) + 'x';
-
-        const bar = document.getElementById('progressBar');
-        setTimeout(() => {
-            bar.style.width = Math.min(pctMature, 100).toFixed(1) + '%';
-            bar.textContent = pctMature.toFixed(1) + '%';
-        }, 100);
-
-        const milestones = sex === 'bull'
-            ? [{ label: '6 months', months: 6 }, { label: '1 year', months: 12 }, { label: '1.5 years', months: 18 },
-               { label: '2 years', months: 24 }, { label: '3 years', months: 36 }, { label: '4 years', months: 48 },
-               { label: '5 years', months: 60 }, { label: '7 years', months: 84 }, { label: '10 years', months: 120 }]
-            : [{ label: '6 months', months: 6 }, { label: '1 year', months: 12 }, { label: '1.5 years', months: 18 },
-               { label: '2 years', months: 24 }, { label: '3 years', months: 36 }, { label: '4 years', months: 48 },
-               { label: '5 years', months: 60 }, { label: '7 years', months: 84 }, { label: '10 years', months: 120 },
-               { label: '15 years', months: 180 }];
-
-        let milestoneHtml = '';
-        for (const ms of milestones) {
-            const msPct = getPercentMature(ms.months, sex);
-            const msHorn = predictedMature * (msPct / 100);
-            const growth = msHorn - hornLength;
-            const isCurrent = Math.abs(ms.months - ageMonths) < 1;
-            const isPast = ms.months < ageMonths - 1;
-            milestoneHtml += `<tr class="${isCurrent ? 'current-row' : ''}">
-                <td>${ms.label}${isCurrent ? ' (now)' : ''}</td>
-                <td>${msPct.toFixed(1)}%</td>
-                <td>${msHorn.toFixed(1)}"</td>
-                <td>${isPast ? '\u2014' : (growth >= 0 ? '+' : '') + growth.toFixed(1) + '"'}</td></tr>`;
+        if (isNaN(dob.getTime()) || isNaN(meas.getTime())) {
+          alert("Please enter valid dates.");
+          return;
         }
-        document.getElementById('milestoneBody').innerHTML = milestoneHtml;
 
-        const summary = generateSummary(sex, ageMonths, hornLength, hornAt15, pctMature);
-        document.getElementById('aiSummary').innerHTML = summary;
+        if (meas < dob) {
+          alert("Measurement date cannot be before the Date of Birth.");
+          return;
+        }
 
-        document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+        const ageMo = monthsBetween(dob, meas);
+        const pct = getPercentAtAge(currentSex, ageMo);
+        const multiplier = 1 / pct;
+        const mature = ttt * multiplier;
 
-    document.getElementById('measureDate').value = new Date().toISOString().split('T')[0];
-</script>
+        // Update hero
+        document.getElementById("matureValue").innerHTML = mature.toFixed(1) + " <span>in</span>";
+        document.getElementById("heroSub").textContent =
+          GROWTH_MODELS[currentSex].label + " · Measured " + ttt + "\" at " + formatAge(ageMo);
 
+        // Stats
+        document.getElementById("ageValue").textContent = formatAge(ageMo);
+        document.getElementById("pctValue").textContent = (pct * 100).toFixed(1) + "%";
+        document.getElementById("multValue").textContent = multiplier.toFixed(3) + "x";
+
+        // Progress bar
+        const pctDisplay = Math.min(100, pct * 100);
+        document.getElementById("progressPct").textContent = pctDisplay.toFixed(1) + "%";
+        document.getElementById("progressFill").style.width = pctDisplay + "%";
+
+        // Milestone table
+        const body = document.getElementById("milestoneBody");
+        body.innerHTML = "";
+
+        const displayAges = [6, 12, 18, 24, 36, 48, 60, 84, 120, 180];
+
+        displayAges.forEach(function (m) {
+          const p = getPercentAtAge(currentSex, m);
+          const pred = mature * p;
+          const growthLeft = Math.max(0, mature - pred);
+
+          const tr = document.createElement("tr");
+          if (Math.abs(m - ageMo) <= 3) {
+            tr.classList.add("current-row");
+          }
+
+          tr.innerHTML =
+            "<td>" + formatAge(m) + "</td>" +
+            "<td>" + (p * 100).toFixed(1) + "%</td>" +
+            "<td>" + pred.toFixed(1) + "\"</td>" +
+            "<td>" + (growthLeft < 0.3 ? "—" : "+" + growthLeft.toFixed(1) + "\"") + "</td>";
+
+          body.appendChild(tr);
+        });
+
+        // Show results
+        const resultsEl = document.getElementById("results");
+        resultsEl.style.display = "block";
+        resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      } catch (err) {
+        console.error("Prediction error:", err);
+        alert("Something went wrong. Please check the values and try again.\n\nError: " + err.message);
+      }
+    });
+  </script>
 </body>
 </html>
