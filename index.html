@@ -1,1 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blue Duck Farm – Horn Prediction Tool</title>
+  <meta name="description" content="Modern Texas Longhorn horn growth predictor for cows and bulls. Updated with contemporary elite data." />
+  <style>
+    :root {
+      --navy: #0f1c2e;
+      --navy-light: #1a2d47;
+      --gold: #c9a227;
+      --gold-soft: #e8d48b;
+      --cream: #f7f3e8;
+      --white: #ffffff;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-500: #64748b;
+      --gray-700: #334155;
+      --success: #059669;
+      --radius: 16px;
+      --shadow: 0 10px 30px -5px rgba(15, 28, 46, 0.12);
+      --shadow-lg: 0 20px 40px -10px rgba(15, 28, 46, 0.18);
+    }
 
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(160deg, #0f1c2e 0%, #1a2d47 45%, #243b55 100%);
+      color: var(--gray-700);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      padding: 32px 0 28px;
+      color: var(--cream);
+    }
+
+    .logo-img {
+      max-width: 180px;
+      height: auto;
+      margin: 0 auto 14px;
+      display: block;
+      filter: drop-shadow(0 6px 16px rgba(0,0,0,0.25));
+    }
+
+    .logo-mark {
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold-soft);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    h1 {
+      font-size: clamp(1.75rem, 5vw, 2.25rem);
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: rgba(247, 243, 232, 0.75);
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px 24px;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title span {
+      display: inline-flex;
+      width: 28px;
+      height: 28px;
+      background: var(--navy);
+      color: var(--gold);
+      border-radius: 8px;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    /* Form */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 560px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    input[type="date"],
+    input[type="number"] {
+      padding: 12px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 10px;
+      font-size: 1rem;
+      color: var(--navy);
+      background: var(--gray-100);
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--gold);
+      background: var(--white);
+    }
+
+    /* Sex Toggle */
+    .sex-toggle {
+      display: flex;
+      background: var(--gray-100);
+      border-radius: 10px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .sex-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      background: transparent;
+      color: var(--gray-500);
+      transition: all 0.2s;
+    }
+
+    .sex-btn.active {
+      background: var(--navy);
+      color: var(--white);
+      box-shadow: 0 2px 8px rgba(15, 28, 46, 0.25);
+    }
+
+    /* Predict Button */
+    .predict-btn {
+      width: 100%;
+      margin-top: 22px;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+      color: var(--white);
+      border: none;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      letter-spacing: 0.02em;
+    }
+
+    .predict-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(15, 28, 46, 0.3);
+    }
+
+    .predict-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Results */
+    #results {
+      display: none;
+      animation: fadeUp 0.4s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-result {
+      text-align: center;
+      padding: 8px 0 20px;
+    }
+
+    .hero-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--gray-500);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .hero-value {
+      font-size: clamp(2.8rem, 10vw, 3.6rem);
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1.1;
+    }
+
+    .hero-value span {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--gray-500);
+    }
+
+    .hero-sub {
+      margin-top: 8px;
+      font-size: 0.95rem;
+      color: var(--gray-500);
+    }
+
+    /* Stats row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    @media (max-width: 480px) {
+      .stats-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stat-card {
+      background: var(--gray-100);
+      border-radius: 12px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-500);
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    /* Progress */
+    .progress-section {
+      margin: 24px 0 8px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--gray-700);
+    }
+
+    .progress-bar {
+      height: 12px;
+      background: var(--gray-200);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #1a2d47, var(--gold));
+      border-radius: 99px;
+      transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* Milestone table */
+    .milestone-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 0.9rem;
+    }
+
+    .milestone-table th {
+      text-align: left;
+      padding: 10px 8px;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-500);
+      border-bottom: 2px solid var(--gray-200);
+      font-weight: 700;
+    }
+
+    .milestone-table td {
+      padding: 11px 8px;
+      border-bottom: 1px solid var(--gray-200);
+      color: var(--navy);
+    }
+
+    .milestone-table tr.current-row {
+      background: rgba(201, 162, 39, 0.08);
+      font-weight: 600;
+    }
+
+    .milestone-table tr.current-row td {
+      color: var(--navy);
+    }
+
+    /* Note */
+    .data-note {
+      margin-top: 20px;
+      padding: 14px 16px;
+      background: var(--gray-100);
+      border-radius: 10px;
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      line-height: 1.55;
+    }
+
+    .data-note strong {
+      color: var(--gray-700);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 28px 16px 10px;
+      color: rgba(247, 243, 232, 0.55);
+      font-size: 0.8rem;
+    }
+
+    footer a {
+      color: var(--gold-soft);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <img class="logo-img" src="blue-duck-farm-logo.png" alt="Blue Duck Farm" />
+      <div class="logo-mark">Blue Duck Farm</div>
+      <h1>Horn Prediction Tool</h1>
+      <p class="subtitle">Modern Texas Longhorn growth predictor for cows &amp; bulls — updated with contemporary elite data</p>
+    </header>
+
+    <!-- Input Card -->
+    <div class="card">
+      <div class="card-title"><span>1</span> Animal Details</div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="dob">Date of Birth</label>
+          <input type="date" id="dob" required />
+        </div>
+
+        <div class="form-group">
+          <label for="measDate">Date of Measurement</label>
+          <input type="date" id="measDate" required />
+        </div>
+
+        <div class="form-group">
+          <label for="ttt">Tip-to-Tip (inches)</label>
+          <input type="number" id="ttt" min="5" max="150" step="0.125" placeholder="e.g. 42.5" required />
+        </div>
+
+        <div class="form-group">
+          <label>Sex</label>
+          <div class="sex-toggle">
+            <button type="button" class="sex-btn active" data-sex="cow" id="btnCow">Cow</button>
+            <button type="button" class="sex-btn" data-sex="bull" id="btnBull">Bull</button>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="predict-btn" id="predictBtn">Predict Horn Growth</button>
+    </div>
+
+    <!-- Results Card -->
+    <div class="card" id="results">
+      <div class="card-title"><span>2</span> Prediction Results</div>
+
+      <div class="hero-result">
+        <div class="hero-label">Projected Mature Tip-to-Tip</div>
+        <div class="hero-value" id="matureValue">— <span>in</span></div>
+        <div class="hero-sub" id="heroSub">—</div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value" id="ageValue">—</div>
+          <div class="stat-label">Age at Measurement</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="pctValue">—</div>
+          <div class="stat-label">% of Mature Horn</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="multValue">—</div>
+          <div class="stat-label">Multiplier Factor</div>
+        </div>
+      </div>
+
+      <div class="progress-section">
+        <div class="progress-header">
+          <span>Growth Progress</span>
+          <span id="progressPct">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <div style="margin-top: 28px;">
+        <div class="card-title" style="font-size: 0.95rem; margin-bottom: 12px;">Growth Milestone Projection</div>
+        <table class="milestone-table">
+          <thead>
+            <tr>
+              <th>Age</th>
+              <th>% of Mature</th>
+              <th>Predicted Horn</th>
+              <th>Growth Left</th>
+            </tr>
+          </thead>
+          <tbody id="milestoneBody">
+            <!-- filled by JS -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="data-note">
+        <strong>Note:</strong> These projections use updated statistical averages from contemporary elite Texas Longhorns (Arrowhead Gallery of Horns — Club 80 / 90 / 100; 80 cows and 88 bulls as of October 2026). Modern genetics keep adding horn later than the 1999 Dalgood / TLJ tables. A 12-month cow is about 33% of mature horn; a 12-month bull is about 39%. Individual animals can exceed or fall short of the average. Models update weekly as more measurement histories are added.
+      </div>
+    </div>
+
+    <footer>
+      Blue Duck Farm · Horn Prediction Tool · v3 (80 cows / 88 bulls, Oct 2026)<br />
+      <a href="https://www.blueduckfarmtx.com" target="_blank" rel="noopener">blueduckfarmtx.com</a>
+    </footer>
+  </div>
+
+  <script>
+    // =====================================================
+    // GROWTH MODELS  (easily editable)
+    // Percent of mature horn reached at key ages
+    // These will be refined with more Club data
+    // =====================================================
+    const GROWTH_MODELS = {
+      cow: {
+        // Empirical curve from Arrowhead Club 80/90/100 cows
+        // (82 animals, Oct 2026). Last TTT used as mature proxy.
+        milestones: [
+          { ageMonths: 6,   pct: 0.20 },
+          { ageMonths: 12,  pct: 0.328 },
+          { ageMonths: 18,  pct: 0.475 },
+          { ageMonths: 24,  pct: 0.613 },
+          { ageMonths: 36,  pct: 0.753 },
+          { ageMonths: 48,  pct: 0.857 },
+          { ageMonths: 60,  pct: 0.894 },
+          { ageMonths: 84,  pct: 0.942 },
+          { ageMonths: 120, pct: 0.985 },
+          { ageMonths: 180, pct: 0.995 }
+        ],
+        label: "Cow"
+      },
+      bull: {
+        // Empirical curve from Arrowhead Club 80/90/100 bulls
+        // (88 animals, Oct 2026)
+        milestones: [
+          { ageMonths: 6,   pct: 0.204 },
+          { ageMonths: 12,  pct: 0.394 },
+          { ageMonths: 18,  pct: 0.594 },
+          { ageMonths: 24,  pct: 0.743 },
+          { ageMonths: 36,  pct: 0.896 },
+          { ageMonths: 48,  pct: 0.944 },
+          { ageMonths: 60,  pct: 0.966 },
+          { ageMonths: 84,  pct: 0.974 },
+          { ageMonths: 120, pct: 0.990 },
+          { ageMonths: 180, pct: 0.995 }
+        ],
+        label: "Bull"
+      }
+    };
+
+    // -------------------------------------------------
+    // Helpers
+    // -------------------------------------------------
+    function monthsBetween(dob, meas) {
+      let months = (meas.getFullYear() - dob.getFullYear()) * 12;
+      months -= dob.getMonth();
+      months += meas.getMonth();
+      if (meas.getDate() < dob.getDate()) months--;
+      return Math.max(0, months);
+    }
+
+    function formatAge(months) {
+      const y = Math.floor(months / 12);
+      const m = months % 12;
+      if (y === 0) return `${m} mo`;
+      if (m === 0) return `${y} yr`;
+      return `${y} yr ${m} mo`;
+    }
+
+    // Linear interpolation between milestones
+    function getPercentAtAge(sex, ageMonths) {
+      const ms = GROWTH_MODELS[sex].milestones;
+      if (ageMonths <= ms[0].ageMonths) return ms[0].pct;
+      if (ageMonths >= ms[ms.length - 1].ageMonths) return ms[ms.length - 1].pct;
+
+      for (let i = 0; i < ms.length - 1; i++) {
+        const a = ms[i];
+        const b = ms[i + 1];
+        if (ageMonths >= a.ageMonths && ageMonths <= b.ageMonths) {
+          const t = (ageMonths - a.ageMonths) / (b.ageMonths - a.ageMonths);
+          return a.pct + t * (b.pct - a.pct);
+        }
+      }
+      return 0.99;
+    }
+
+    // -------------------------------------------------
+    // UI State
+    // -------------------------------------------------
+    let currentSex = "cow";
+
+    document.getElementById("btnCow").addEventListener("click", () => {
+      currentSex = "cow";
+      document.getElementById("btnCow").classList.add("active");
+      document.getElementById("btnBull").classList.remove("active");
+    });
+
+    document.getElementById("btnBull").addEventListener("click", () => {
+      currentSex = "bull";
+      document.getElementById("btnBull").classList.add("active");
+      document.getElementById("btnCow").classList.remove("active");
+    });
+
+    // Default dates for convenience
+    const today = new Date().toISOString().slice(0, 10);
+    document.getElementById("measDate").value = today;
+
+    // -------------------------------------------------
+    // Predict
+    // -------------------------------------------------
+    document.getElementById("predictBtn").addEventListener("click", function () {
+      try {
+        const dobStr = document.getElementById("dob").value;
+        const measStr = document.getElementById("measDate").value;
+        const tttRaw = document.getElementById("ttt").value;
+        const ttt = parseFloat(tttRaw);
+
+        if (!dobStr || !measStr || tttRaw === "" || isNaN(ttt) || ttt < 5) {
+          alert("Please fill in:\n• Date of Birth\n• Date of Measurement\n• Tip-to-Tip measurement (at least 5 inches)");
+          return;
+        }
+
+        const dob = new Date(dobStr + "T12:00:00");
+        const meas = new Date(measStr + "T12:00:00");
+
+        if (isNaN(dob.getTime()) || isNaN(meas.getTime())) {
+          alert("Please enter valid dates.");
+          return;
+        }
+
+        if (meas < dob) {
+          alert("Measurement date cannot be before the Date of Birth.");
+          return;
+        }
+
+        const ageMo = monthsBetween(dob, meas);
+        const pct = getPercentAtAge(currentSex, ageMo);
+        const multiplier = 1 / pct;
+        const mature = ttt * multiplier;
+
+        // Update hero
+        document.getElementById("matureValue").innerHTML = mature.toFixed(1) + " <span>in</span>";
+        document.getElementById("heroSub").textContent =
+          GROWTH_MODELS[currentSex].label + " · Measured " + ttt + "\" at " + formatAge(ageMo);
+
+        // Stats
+        document.getElementById("ageValue").textContent = formatAge(ageMo);
+        document.getElementById("pctValue").textContent = (pct * 100).toFixed(1) + "%";
+        document.getElementById("multValue").textContent = multiplier.toFixed(3) + "x";
+
+        // Progress bar
+        const pctDisplay = Math.min(100, pct * 100);
+        document.getElementById("progressPct").textContent = pctDisplay.toFixed(1) + "%";
+        document.getElementById("progressFill").style.width = pctDisplay + "%";
+
+        // Milestone table
+        const body = document.getElementById("milestoneBody");
+        body.innerHTML = "";
+
+        const displayAges = [6, 12, 18, 24, 36, 48, 60, 84, 120, 180];
+
+        displayAges.forEach(function (m) {
+          const p = getPercentAtAge(currentSex, m);
+          const pred = mature * p;
+          const growthLeft = Math.max(0, mature - pred);
+
+          const tr = document.createElement("tr");
+          if (Math.abs(m - ageMo) <= 3) {
+            tr.classList.add("current-row");
+          }
+
+          tr.innerHTML =
+            "<td>" + formatAge(m) + "</td>" +
+            "<td>" + (p * 100).toFixed(1) + "%</td>" +
+            "<td>" + pred.toFixed(1) + "\"</td>" +
+            "<td>" + (growthLeft < 0.3 ? "—" : "+" + growthLeft.toFixed(1) + "\"") + "</td>";
+
+          body.appendChild(tr);
+        });
+
+        // Show results
+        const resultsEl = document.getElementById("results");
+        resultsEl.style.display = "block";
+        resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      } catch (err) {
+        console.error("Prediction error:", err);
+        alert("Something went wrong. Please check the values and try again.\n\nError: " + err.message);
+      }
+    });
+  </script>
+</body>
+</html>
