@@ -479,12 +479,12 @@
       </div>
 
       <div class="data-note">
-        <strong>Note:</strong> These projections use updated statistical averages from contemporary elite Texas Longhorns (Arrowhead Gallery of Horns — Club 80 / 90 / 100; 80 cows and 88 bulls as of October 2026). Modern genetics keep adding horn later than the 1999 Dalgood / TLJ tables. A 12-month cow is about 33% of mature horn; a 12-month bull is about 39%. Individual animals can exceed or fall short of the average. Models update weekly as more measurement histories are added.
+        <strong>Note:</strong> Cow projections use the v4 curve, based on Arrowhead modern genetics (born 2016+), Oct 2026: medians of percent-of-last-tape for 382+ Arrowhead Cattle Company Club 90/100 cows. Bull projections remain on the v3 curve (Arrowhead Gallery of Horns — Club 80 / 90 / 100; 88 bulls as of October 2026). Modern genetics keep adding horn later than the 1999 Dalgood / TLJ tables. A 12-month cow is about 35% of mature horn; a 12-month bull is about 39%. Individual animals can exceed or fall short of the average. Models update weekly as more measurement histories are added.
       </div>
     </div>
 
     <footer>
-      Blue Duck Farm · Horn Prediction Tool · v3 (80 cows / 88 bulls, Oct 2026)<br />
+      Blue Duck Farm · Horn Prediction Tool · cows v4 (Arrowhead modern genetics, born 2016+, Oct 2026) · bulls v3 (88 bulls, Oct 2026)<br />
       <a href="https://www.blueduckfarmtx.com" target="_blank" rel="noopener">blueduckfarmtx.com</a>
     </footer>
   </div>
@@ -497,17 +497,18 @@
     // =====================================================
     const GROWTH_MODELS = {
       cow: {
-        // Empirical curve from Arrowhead Club 80/90/100 cows
-        // (82 animals, Oct 2026). Last TTT used as mature proxy.
+        // v4 empirical curve: medians of percent-of-last-tape for
+        // 382+ Arrowhead Club 90/100 cows born 2016+ (Oct 2026).
+        // Last TTT used as mature proxy.
         milestones: [
-          { ageMonths: 6,   pct: 0.20 },
-          { ageMonths: 12,  pct: 0.328 },
-          { ageMonths: 18,  pct: 0.475 },
-          { ageMonths: 24,  pct: 0.613 },
-          { ageMonths: 36,  pct: 0.753 },
-          { ageMonths: 48,  pct: 0.857 },
-          { ageMonths: 60,  pct: 0.894 },
-          { ageMonths: 84,  pct: 0.942 },
+          { ageMonths: 6,   pct: 0.1939 },
+          { ageMonths: 12,  pct: 0.3524 },
+          { ageMonths: 18,  pct: 0.496 },
+          { ageMonths: 24,  pct: 0.6196 },
+          { ageMonths: 36,  pct: 0.7702 },
+          { ageMonths: 48,  pct: 0.8599 },
+          { ageMonths: 60,  pct: 0.9106 },
+          { ageMonths: 84,  pct: 0.9728 },
           { ageMonths: 120, pct: 0.985 },
           { ageMonths: 180, pct: 0.995 }
         ],
